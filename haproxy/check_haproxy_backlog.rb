@@ -18,6 +18,14 @@ OptionParser.new do |opts|
     options.port = p
   end
 
+  opts.on("-u", "--username USERNAME", "HAProxy username") do |u|
+    options.username = u
+  end
+
+  opts.on("-P", "--password PASSWORD", "HAProxy password") do |P|
+    options.password = P
+  end
+
   opts.on("-n", "--name NAME", "HAProxy proxy name") do |n|
     options.name = n
   end
@@ -41,8 +49,16 @@ if missing_options.length > 0
   exit 1
 end
 
-uri = URI.parse("http://#{options.host}:#{options.port}/;csv")
-response = Net::HTTP.get_response(uri)
+uri = URI.parse("http://#{options[:host]}:#{options[:port]}/;csv")
+if options[:username].nil?
+  response = Net::HTTP.get_response(uri)
+else
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Get.new(uri.request_uri)
+  request.basic_auth(options[:username], options[:password])
+  response = http.request(request)
+end
+
 
 response.body.each_line do |line|
 
