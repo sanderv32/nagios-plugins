@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'net/http'
+require 'uri'
 require 'optparse'
 
 # Constants
@@ -15,6 +16,12 @@ OptionParser.new do |opts|
   end
   opts.on("-p", "--port PORT", "Port the stats interface is listening on") do |p|
     options[:port] = p
+  end
+  opts.on("-u", "--user USERNAME", "Username to login") do |u|
+    options[:username] = u
+  end
+  opts.on("-P", "--password USERNAME", "Password to use") do |P|
+    options[:password] = P
   end
   opts.on("-t", "--test TESTSPEC", 
           "Test specification:",
@@ -45,7 +52,14 @@ if options[:port].nil?
 end
 
 uri = URI.parse "http://#{options[:host]}:#{options[:port]}/;csv"
-response = Net::HTTP.get_response(uri)
+if options[:username].nil?
+  response = Net::HTTP.get_response(uri)
+else
+  http = Net::HTTP.new(uri.host, uri.port)
+  request = Net::HTTP::Get.new(uri.request_uri)
+  request.basic_auth(options[:username], options[:password])
+  response = http.request(request)
+end
 
 def is_up?(entry)
   entry.split(",")[17] == "UP"
