@@ -12,7 +12,7 @@ HAProxy service.
 
 ### Usage
 
-    check_haproxy.rb -h [haproxy hostname] -p [haproxy stats port] -t [testspec]
+    check_haproxy.rb -h [haproxy hostname] -p [haproxy stats port] -u [username] -P [password] -t [testspec]
 
 A "testspec" is a series of four values separated by commas, and you can specify more
 than one testspec by repeating the `-t` option.
